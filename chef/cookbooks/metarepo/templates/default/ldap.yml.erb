@@ -1,0 +1,7 @@
+port: <%= @port %>
+hostnames: [ <%= @ad_hosts.join( "," ) %> ]
+rdn_prefix: "uid"
+search_base: "<%= @search_base %>"
+ldap_read_dn: "<%= @ldap_read_dn %>"
+ldap_read_pw: "<%= @ldap_read_pw %>"
+ldap_protocol: 3

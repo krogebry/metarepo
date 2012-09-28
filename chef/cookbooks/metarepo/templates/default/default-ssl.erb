@@ -1,0 +1,20 @@
+<VirtualHost _default_:443>
+  ServerAdmin postmaster@hp.com
+
+  DocumentRoot /var/webapps/<%= @project_name %>/public
+  <Directory /var/webapps/<%= @project_name %>>
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Order allow,deny
+    allow from all
+  </Directory>
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  LogLevel warn
+  CustomLog ${APACHE_LOG_DIR}/ssl_access.log combined
+
+  SSLEngine on
+  SSLCertificateFile    /etc/ssl/private/server.crt.pem
+  SSLCertificateKeyFile /etc/ssl/private/server.key.pem
+</VirtualHost>
+

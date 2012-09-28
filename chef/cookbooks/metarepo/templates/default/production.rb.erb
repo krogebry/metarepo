@@ -1,0 +1,57 @@
+##
+# Production configuration
+DEFAULT_CHEF_ENVIRONMENT = "rndc"
+
+Sasha::Application.configure do
+  config.memcache_servers = [<%= @memc_nodes.map{|n| "'%s:%i'" % [n["ipaddress"],11211] }.join( ',' ) %>]
+
+  config.offline_mode = false
+  config.cache_classes = true
+  config.cache_store = :dalli_store, config.memcache_servers, { :namespace => ProjectClassName, :compress => true }
+  config.consider_all_requests_local = false
+  config.action_controller.perform_caching = true
+  config.serve_static_assets = true
+  config.assets.compress = false
+  config.assets.compile = true
+  config.assets.digest = false
+  config.i18n.fallbacks = true
+  config.active_support.deprecation = :notify
+
+  config.session_expire_time = 1.hour
+
+  config.action_mailer.default_url_options = {
+    :port => "",
+    :path => "<%= @path %>",
+    :schema => "<%= @schema %>",
+    :hostname => "<%= @hostname %>"
+  }
+
+  config.couchdb_servers = {
+    #:aw1 => {
+      #:rndc => [
+        #"rndc-chef-server.ops.uswest.hpcloud.net"
+      #]
+    #},
+    :aw2 => {
+      :ops => [
+        "ops-couchdb01-aw2.chef.uswest.hpcloud.net"
+        #"ops-couchdb02-aw2.chef.uswest.hpcloud.net"
+      ],
+      :az1 => [
+        "az1-couchdb01-aw2.chef.uswest.hpcloud.net",
+        #"az1-couchdb02-aw2.chef.uswest.hpcloud.net"
+      ],
+      :az2 => [
+        "az2-couchdb01-aw2.chef.uswest.hpcloud.net",
+        #"az2-couchdb02-aw2.chef.uswest.hpcloud.net"
+      ],
+      :az3 => [
+        "az3-couchdb01-aw2.chef.uswest.hpcloud.net"
+      ]
+    }
+  }
+
+  config.clients = {
+    :accessapi => YAML.load_file( "%s/config/api_clients/accessapi.yml" % ::Rails.root )
+  }
+end

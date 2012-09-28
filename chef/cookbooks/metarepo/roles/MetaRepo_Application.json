@@ -1,0 +1,16 @@
+{
+  "name": "MetaRepo_Application",
+  "description": "",
+  "json_class": "Chef::Role",
+  "default_attributes": {
+    "firewall": { "rules": [ { "https": { "port": "443" } } ] }
+  },
+  "override_attributes": {
+  },
+  "chef_type": "role",
+  "run_list": [
+    "metarepo::default"
+  ],
+  "env_run_lists": {
+  }
+}

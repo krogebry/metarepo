@@ -1,0 +1,9 @@
+production:
+  host: <%= @hostname %>
+  pool: 5
+  adapter: mysql2
+  encoding: utf8
+  database: <%= @name %>
+  username: <%= @username %>
+  password: <%= @password %>
+  reconnect: false

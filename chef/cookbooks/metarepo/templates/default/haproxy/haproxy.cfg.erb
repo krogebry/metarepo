@@ -1,0 +1,49 @@
+global
+	#log 127.0.0.1   local0
+	log 127.0.0.1   local1 debug
+	maxconn 4096
+	#debug
+	#quiet
+	user haproxy
+	group haproxy
+	spread-checks 5
+
+defaults
+	log     global
+	mode    http
+	option  httplog
+	option  dontlognull
+	#option forwardfor except <%= node[:ipaddress ] %>
+	retries 3
+	maxconn 2000
+	contimeout      5000
+	clitimeout      50000
+	srvtimeout      50000
+
+	stats enable
+	stats hide-version
+	stats refresh 30s
+
+	option redispatch
+	option allbackups
+
+listen http_proxy <%= node[:ipaddress] %>:80
+	mode http
+	balance roundrobin
+	option httpchk HEAD /
+	option httpclose
+	stats enable
+	stats uri /haproxy/stats
+	stats refresh 5s
+	stats realm "HAProxy Statistics"
+	stats auth admin:Op8cishu
+	<% @nodes.each do |n| %>
+	server <%= n[:fqdn] %> <%= n[:ipaddress] %> check port 80
+	<% end %>
+
+listen https_proxy <%= node[:ipaddress] %>:443
+	mode tcp
+	balance source
+	<% @nodes.each do |n| %>
+	server <%= n[:fqdn] %> <%= n[:ipaddress] %>:443 check port 443
+	<% end %>

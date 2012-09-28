@@ -1,0 +1,16 @@
+--
+-- Grants access to a service
+--
+CREATE DATABASE IF NOT EXISTS <%= @database %>;
+USE <%= @database %>;
+
+CREATE USER '<%= @username %>'@'localhost' IDENTIFIED BY "<%= @password %>";
+
+GRANT ALL ON <%= @database %>.* TO '<%= @username %>'@'localhost' IDENTIFIED BY "<%= @password %>";
+GRANT ALL ON <%= @database %>.* TO '<%= @username %>'@'127.0.0.1' IDENTIFIED BY "<%= @password %>";
+
+<% @app_nodes.each do |node| ## Grant access to the application nodes. %>
+	GRANT ALL ON <%= @database %>.* TO '<%= @username %>'@'<%= node['ipaddress'] %>' IDENTIFIED BY "<%= @password %>";
+<% end %>
+
+-- FLUSH PRIVILEGES;

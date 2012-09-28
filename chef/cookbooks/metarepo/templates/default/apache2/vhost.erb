@@ -1,0 +1,22 @@
+<VirtualHost *:<%= @port %>>
+	ServerAdmin postmaster@hp.com
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+	LogLevel warn
+	CustomLog ${APACHE_LOG_DIR}/ssl_access.log combined
+
+	DocumentRoot /var/webapps/<%= @project_name %>/public
+	<Directory /var/www/<%= @project_name %>>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride None
+		Order allow,deny
+		allow from all
+		#RailsBaseURI /<%= node.default[node.default[:project_name]][:url_path] %>
+	</Directory>
+
+	<% if( @use_ssl == true ) %>
+	SSLEngine on
+	SSLCertificateFile    /etc/ssl/private/server.crt.pem
+	SSLCertificateKeyFile /etc/ssl/private/server.key.pem
+	<% end %>
+</VirtualHost>
