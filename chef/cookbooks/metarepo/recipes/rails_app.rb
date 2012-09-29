@@ -6,8 +6,7 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-#node[:project_name] = "sasha"
-project_name = "sasha"
+project_name = "metarepo"
 
 service "apache2" do
 	action [ :enable, :start ]
@@ -17,7 +16,7 @@ end
 directory "/var/webapps/%s" % project_name do
   mode "0775"
   owner "www-data"
-  group project_name
+  group "www-data"
 end
 
 link "/var/www/%s" % project_name do

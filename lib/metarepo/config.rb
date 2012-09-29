@@ -26,7 +26,9 @@ class Metarepo
     pool_path '/var/opt/metarepo/pool'
     repo_path '/var/opt/metarepo/repo'
     upstream_path '/var/opt/metarepo/upstream'
-		uri "http://localhost:3002"
+		#uri "http://localhost:3002"
+		uri "http://metarepo.rndc.aw1.hpcloud.net:443"
+		#uri "http://metarepo.rndc.aw1.hpcloud.net:443"
     gpg_key "metarepo@example.com"
 
   end

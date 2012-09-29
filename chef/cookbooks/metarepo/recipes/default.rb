@@ -1,10 +1,10 @@
 ##
-# sasha::default
+# metarepo::default
 #
 # Copyright 2012, HPCS
 #
 # All rights reserved - Do Not Redistribute
-project_name = "sasha"
+project_name = "metarepo"
 
 #cookbook_file "/home/%s/.chef/%s_chef.pem" % [project_name,project_name] do
   #mode "0644"

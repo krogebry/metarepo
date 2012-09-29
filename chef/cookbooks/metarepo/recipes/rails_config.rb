@@ -1,24 +1,25 @@
 ##
 # Service side cookbook.
 #
-# Cookbook Name:: sasha
+# Cookbook Name:: service_name
 # Recipe:: default
 #
 # Copyright 2012, HPCloudServices
 # @author Bryan Kroger ( bryan.kroger@hp.com )
 
+service_name = "metarepo"
 
 
 ## Load the encrypted secret data.
 begin
   ## Note: this data should *NEVER* be stored on the node.
-  #chef_certs = get_encrypted_bag( "sasha","chef_certs" )
-  ad_secure_data = get_encrypted_bag( "sasha","active_directory" )
-  app_secure_data = get_encrypted_bag( "sasha","app" )
-  project_name = "sasha"
+  #chef_certs = get_encrypted_bag( service_name,"chef_certs" )
+  ad_secure_data = get_encrypted_bag( service_name,"active_directory" )
+  app_secure_data = get_encrypted_bag( service_name,"app" )
+  project_name = service_name
 
 rescue => e
-  Chef::Log.fatal( "sasha::default Unable to get encrypted data bag: %s" % e )
+  Chef::Log.fatal( "%s::default Unable to get encrypted data bag: %s" % [service_name,e] )
   Chef::Log.fatal( e.backtrace.join( "\n" ) )
 
 end
@@ -30,7 +31,7 @@ begin
   ## Find the mysql master node.
   mysql_master_nodes = search( :node,"run_list:role\\[AccessAPIMySQLMaster\\]" )
 
-  template "/var/webapps/sasha/config/database.yml" do
+  template "/var/webapps/%s/config/database.yml" % service_name do
     mode "0644"
     owner "www-data"
     group "www-data"
@@ -45,7 +46,7 @@ begin
   end
 
 rescue => e
-  Chef::Log.fatal( "sasha::default Failed to process database config: %s" % e )
+  Chef::Log.fatal( "%s::default Failed to process database config: %s" % [service_name,e] )
   Chef::Log.fatal(e.backtrace.join( "\n" ))
 
 end
@@ -57,7 +58,7 @@ begin
   ## Look for the memcache nodes.
   memc_nodes = search( :node,"run_list:role\\[AccessAPICache\\]" )
 
-  directory "/var/webapps/sasha/config/environments" do
+  directory "/var/webapps/%s/config/environments" % service_name do
     mode "0755"
     owner "www-data"
     group "www-data"
@@ -67,7 +68,7 @@ begin
 
   ## Create the api client configuration files.
   app_secure_data["api_clients"].each do |name,cfg_client|
-    Chef::Log.fatal( "sasha::rails_config::api_client: %s" % cfg_client.inspect )
+    Chef::Log.fatal( "%s::rails_config::api_client: %s" % [service_name,cfg_client.inspect] )
     api_client name do
       url cfg_client["url"]
       client_id cfg_client["client_id"]
@@ -78,14 +79,14 @@ begin
     end
   end
 
-  template "/var/webapps/sasha/config/environments/production.rb" do
+  template "/var/webapps/%s/config/environments/production.rb" % service_name do
     mode "0755"
     owner "www-data"
     group "www-data"
     source "production.rb.erb"
     notifies :restart, "service[apache2]"
     variables(
-		  :path => "sasha",
+		  :path => service_name,
       :schema => "https",
       :hostname => node[:ipaddress],
 		  :memc_nodes => memc_nodes
@@ -93,7 +94,7 @@ begin
   end
 
 rescue => e
-  Chef::Log.fatal( "sasha::default Failed to process environment config: %s" % e )
+  Chef::Log.fatal( "%s::default Failed to process environment config: %s" % [service_name,e] )
   Chef::Log.fatal(e.backtrace.join( "\n" ))
 
 end
@@ -106,9 +107,9 @@ begin
   #cmd_get_ad_hosts = "dig -t SRV _ldap._tcp.dc._msdcs.hpcloud.ms |grep \"^_ldap\"|awk '{print $8}'|sed 's/\.$//'"
   #ad_hosts = `#{cmd_get_ad_hosts}`.split()
   ad_hosts = [ "aw2clouddc02.hpcloud.ms", "aw2clouddc01.hpcloud.ms", "ae1clouddc03.hpcloud.ms", "ae1clouddc01.hpcloud.ms", "aw2clouddc03.hpcloud.ms" ]
-  #Chef::Log.debug( "sasha:default:ADHosts: %s" % ad_hosts.inspect )
+  #Chef::Log.debug( "%s:default:ADHosts: %s" % [service_name,ad_hosts.inspect] )
 
-  template "/var/webapps/sasha/config/ldap.yml" do
+  template "/var/webapps/%s/config/ldap.yml" % service_name do
     mode "0644"
     owner "www-data"
     group "www-data"
@@ -124,7 +125,7 @@ begin
   end
  
 rescue => e
-  Chef::Log.fatal( "sasha::default:ad_config Failed to create ldap config: %s" % e )
+  Chef::Log.fatal( "%s::default:ad_config Failed to create ldap config: %s" % [service_name,e] )
   Chef::Log.fatal(e.backtrace.join( "\n" ))
 
 end
