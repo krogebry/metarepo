@@ -1,0 +1,70 @@
+#!/bin/bash
+##
+# Build script
+#
+# @author Bryan Kroger ( bryan.kroger@hp.com )
+# @copyright 2012 HPCS
+
+BUNDLER=`which bundle`
+PACKAGE_NAME="metarepo"
+PROJECT_NAME="metarepo"
+BUILDDIR=/tmp/build-${PROJECT_NAME}
+
+## Setup
+rm -rf $BUILDDIR
+mkdir $BUILDDIR
+mkdir -p $BUILDDIR/var/webapps/${PROJECT_NAME}
+mkdir -p $BUILDDIR/var/${PROJECT_NAME}
+fakeroot chown -R root:root $BUILDDIR
+chmod 755 $BUILDDIR/var
+chmod 755 $BUILDDIR/var/webapps
+chmod 755 $BUILDDIR/var/webapps/${PROJECT_NAME}
+cp -R * $BUILDDIR/var/webapps/${PROJECT_NAME}
+#export http_proxy="http://web-proxy.hpl.hp.com:8088"
+#(cd $BUILDDIR/var/webapps/${PROJECT_NAME}; ${BUNDLER} install --deployment)
+VERSION=$(grep 'VERSION =' $BUILDDIR/var/webapps/${PROJECT_NAME}/lib/metarepo.rb | cut -f2 -d\" | sed 's/^v//')
+#rm ${BUILDDIR}/var/webapps/${PROJECT_NAME}/config/database.yml
+#rm ${BUILDDIR}/var/webapps/${PROJECT_NAME}/log/*
+fakeroot chown -R www-data:www-data ${BUILDDIR}/var/webapps/${PROJECT_NAME}/*
+
+mkdir -p ${BUILDDIR}/DEBIAN
+
+cat <<EOF > ${BUILDDIR}/DEBIAN/postinst
+#!/bin/bash
+chown -R www-data:www-data /var/webapps/${PROJECT_NAME}/
+cd /var/webapps/${PROJECT_NAME}
+bundle update
+#RAILS_ENV='production' rake db:migrate 
+sequel -m /var/webapps/${PROJECT_NAME}/migrations/ -r mysql2 "mysql2://metarepo:329ff6a7edd44123b3fcb91faa759b47@mysql.rndc.aw1.hpcloud.net/metarepo_production"
+chown -R www-data:www-data /var/webapps/${PROJECT_NAME}/
+chmod -R 775 /var/webapps/${PROJECT_NAME}/*
+EOF
+
+chmod 755 ${BUILDDIR}/DEBIAN/postinst
+
+cat <<EOF > ${BUILDDIR}/DEBIAN/control
+Package: ${PACKAGE_NAME}
+Version: ${VERSION}
+Section: web 
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 1024
+Maintainer: Bryan Kroger [bryan.kroger@hp.com]
+Provides: ${PACKAGE_NAME}
+Description: The Access authorization api.
+EOF
+
+mkdir dpkg
+dpkg -b ${BUILDDIR} dpkg/${PACKAGE_NAME}-${VERSION}.deb
+
+## Deliver the package to metarepo.
+#chmod 0600 id_rsa
+#UPSTREAM_NAME="jenkins_ops_auto"
+#METAREPO_HOSTNAME="metarepo.rndc.aw1.hpcloud.net"
+
+#echo "Pushing file..."
+#scp -o StrictHostKeyChecking=no -i id_rsa dpkg/${PACKAGE_NAME}-${VERSION}.deb krogerb@metarepo.rndc.aw1.hpcloud.net:/var/opt/metarepo/upstream/${UPSTREAM_NAME}
+
+#echo "Updating index..."
+#ssh -o StrictHostKeyChecking=no -i id_rsa krogerb@${METAREPO_HOSTNAME} "cd /var/opt/metarepo/upstream/${UPSTREAM_NAME} ; dpkg-scanpackages ./ > Packages ; rm -rf Packages.gz ; gzip Packages"

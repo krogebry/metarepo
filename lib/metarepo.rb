@@ -21,7 +21,7 @@ require 'metarepo/log'
 require 'metarepo/config'
 
 class Metarepo
-  VERSION = "0.1.0"
+  VERSION = "0.1.3"
 
   class << self
     def create_directory(dir)

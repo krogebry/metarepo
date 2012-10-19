@@ -48,10 +48,10 @@ class Metarepo
 						if line =~ /^Filename: (.+)$/
 							file_list << File.expand_path(File.join(
 								real_path,
-								"..",
-								"..",
-								"..",
-								"..",
+								#"..",
+								#"..",
+								#"..",
+								#"..",
 								$1
 						  ))
 						end

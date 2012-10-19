@@ -22,14 +22,12 @@ class Metarepo
   class Config
     extend Mixlib::Config
 
-    db_connect 'mysql2://root:orange1@localhost/metarepo'
-    pool_path '/var/opt/metarepo/pool'
-    repo_path '/var/opt/metarepo/repo'
-    upstream_path '/var/opt/metarepo/upstream'
-		#uri "http://localhost:3002"
-		uri "http://metarepo.rndc.aw1.hpcloud.net:443"
-		#uri "http://metarepo.rndc.aw1.hpcloud.net:443"
+		uri "https://15.184.34.120"
     gpg_key "metarepo@example.com"
+    pool_path '/mnt/data/metarepo/pool'
+    repo_path '/mnt/data/metarepo/repo'
+    db_connect 'mysql2://metarepo:329ff6a7edd44123b3fcb91faa759b47@mysql.rndc.aw1.hpcloud.net/metarepo_production'
+    upstream_path '/mnt/data/metarepo/upstream'
 
   end
 end

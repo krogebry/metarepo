@@ -110,7 +110,7 @@ class Metarepo
       files_to_include_in_release = []
       package_files = []
       archs.each do |arch|
-        arch_dist_path = File.join(repo_path, "dists", "main", "binary-#{arch}")
+        arch_dist_path = File.join(repo_path, "dists", "stable", "main", "binary-#{arch}")
         Metarepo.create_directory(arch_dist_path)
         files_to_include_in_release << File.join(arch_dist_path, "Release")
         files_to_include_in_release << File.join(arch_dist_path, "Packages")
@@ -140,7 +140,7 @@ Architecture: #{arch}
               when /^Architecture: (.+)$/
                 package_arch = $1
               end
-              package_data << line
+              package_data << line 
             end
           end
           deb_file =~ /\/(pool\/.+)$/
@@ -163,7 +163,7 @@ Architecture: #{arch}
         pf.close
         Metarepo.command("bash -c 'cat #{pf.path} | gzip > #{pf.path}.gz'")
       end
-      File.open(File.join(repo_path, "dists", "main", "Release"), "w") do |release_file|
+      File.open(File.join(repo_path, "dists", "stable", "main", "Release"), "w") do |release_file|
         release_file.puts <<-EOH
 Origin: metarepo
 Label: metarepo 
@@ -189,14 +189,14 @@ EOH
         release_file.puts sha1string
         release_file.puts sha256string
       end
-      File.unlink(File.join(repo_path, "dists", "main", "Release.gpg")) if File.exists?(File.join(repo_path, "dists", "main", "Release.gpg"))
-      Metarepo.command("gpg -abs --no-tty --use-agent -u'#{Metarepo::Config['gpg_key']}' -o'#{File.join(repo_path, "dists", "main", "Release.gpg")}' #{File.join(repo_path, "dists", "main", "Release")}")
-      Dir.mktmpdir("gpg") do |tmpdir|
-        Metarepo.command("chmod 0700 #{tmpdir}")
-        Metarepo.command("bash -c 'gpg -q --export -a \'#{Metarepo::Config['gpg_key']}\' > #{File.join(repo_path, "pubkey.gpg")}'")
-        Metarepo.command("bash -c 'cat #{File.join(repo_path, "pubkey.gpg")} | gpg -q --homedir #{tmpdir} --import'")
-        Metarepo.command("mv #{File.join(tmpdir, "pubring.gpg")} #{File.join(repo_path, "keyring.gpg")}")
-      end
+      #File.unlink(File.join(repo_path, "dists", "stable", "main", "Release.gpg")) if File.exists?(File.join(repo_path, "dists", "stable", "main", "Release.gpg"))
+      #Metarepo.command("gpg -abs --no-tty --use-agent -u'#{Metarepo::Config['gpg_key']}' -o'#{File.join(repo_path, "dists", "stable", "main", "Release.gpg")}' #{File.join(repo_path, "dists", "stable", "main", "Release")}")
+      #Dir.mktmpdir("gpg") do |tmpdir|
+        #Metarepo.command("chmod 0700 #{tmpdir}")
+        #Metarepo.command("bash -c 'gpg -q --export -a \'#{Metarepo::Config['gpg_key']}\' > #{File.join(repo_path, "pubkey.gpg")}'")
+        #Metarepo.command("bash -c 'cat #{File.join(repo_path, "pubkey.gpg")} | gpg -q --homedir #{tmpdir} --import'")
+        #Metarepo.command("mv #{File.join(tmpdir, "pubring.gpg")} #{File.join(repo_path, "keyring.gpg")}")
+      #end
     end
 
     def update_index

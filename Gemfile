@@ -4,7 +4,6 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem "sequel"
-gem "pg", ">= 0"
 gem "mixlib-config"
 gem "mysql2"
 gem "mixlib-log"

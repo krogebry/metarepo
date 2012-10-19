@@ -17,6 +17,7 @@
 #
 
 require 'sinatra/base'
+require 'pp'
 require 'yajl'
 require 'metarepo'
 require 'metarepo/upstream'
@@ -142,6 +143,21 @@ class Metarepo
       serialize(response)
     end
 
+    get "/package/search" do
+			content_type :json
+      response = {}
+      #search_field = params[:search_field] ||= "name"
+      #Metarepo::Package.dataset.select({ search_field => params[:search] }).each do |package|
+      pp params
+      #Metarepo::Package.dataset.where( params ).each do |package|
+      Metarepo::Package.dataset.where({ :name => params['name'], :version => params['version'] }).each do |package|
+        pp package
+        response[package.shasum] = package_serialize(package)
+      end
+      serialize(response)
+      #serialize(package_serialize(packages))
+    end
+
     get "/package/:shasum" do
 			content_type :json
       response = {}
@@ -221,6 +237,16 @@ class Metarepo
         }
       )
 		end
+
+    get "/repo/:name/packages" do
+			content_type :json
+      repo = Metarepo::Repo[:name => params["name"]]
+      response = {}
+      repo.packages_dataset.all do |p|
+        response[p.shasum] = package_serialize(p) 
+      end
+      serialize(response)
+    end
 
     put "/repo/:name/packages" do
 			content_type :json
