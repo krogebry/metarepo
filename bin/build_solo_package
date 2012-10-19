@@ -59,12 +59,12 @@ mkdir dpkg
 dpkg -b ${BUILDDIR} dpkg/${PACKAGE_NAME}-${VERSION}.deb
 
 ## Deliver the package to metarepo.
-chmod 0600 id_rsa
-UPSTREAM_NAME="jenkins_ops_auto"
-METAREPO_HOSTNAME="metarepo.rndc.aw1.hpcloud.net"
+#chmod 0600 id_rsa
+#UPSTREAM_NAME="jenkins_ops_auto"
+#METAREPO_HOSTNAME="metarepo.rndc.aw1.hpcloud.net"
 
-echo "Pushing file..."
-scp -o StrictHostKeyChecking=no -i id_rsa dpkg/${PACKAGE_NAME}-${VERSION}.deb krogerb@metarepo.rndc.aw1.hpcloud.net:/var/opt/metarepo/upstream/${UPSTREAM_NAME}
+#echo "Pushing file..."
+#scp -o StrictHostKeyChecking=no -i id_rsa dpkg/${PACKAGE_NAME}-${VERSION}.deb krogerb@metarepo.rndc.aw1.hpcloud.net:/var/opt/metarepo/upstream/${UPSTREAM_NAME}
 
-echo "Updating index..."
-ssh -o StrictHostKeyChecking=no -i id_rsa krogerb@${METAREPO_HOSTNAME} "cd /var/opt/metarepo/upstream/${UPSTREAM_NAME} ; dpkg-scanpackages ./ > Packages ; rm -rf Packages.gz ; gzip Packages"
+#echo "Updating index..."
+#ssh -o StrictHostKeyChecking=no -i id_rsa krogerb@${METAREPO_HOSTNAME} "cd /var/opt/metarepo/upstream/${UPSTREAM_NAME} ; dpkg-scanpackages ./ > Packages ; rm -rf Packages.gz ; gzip Packages"

@@ -1,0 +1,2 @@
+wget  -O /dev/null http://keg.dev.uswest.hpcloud.net:8080/job/metarepo/build?token=build
+
